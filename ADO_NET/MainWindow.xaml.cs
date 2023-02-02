@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,6 +59,8 @@ namespace ADO_NET
                 MessageBox.Show(ex.Message);
                 this.Close();
             }
+            ShowMonitor();
+            ShowDepartmentsView();
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -79,7 +82,7 @@ namespace ADO_NET
                 @"CREATE TABLE Departments(
                  Id          CHAR(36) NOT NULL PRIMARY KEY,
                  Name        VARCHAR(50) NOT NULL
-                )";
+                ) ENGINE = INNODB DEFAULT CHARSET = UTF8";
             /* MySql: CREATE TABLE Departments(
                  Id          CHAR(36) NOT NULL PRIMARY KEY,
                  Name        VARCHAR(50) NOT NULL
@@ -98,6 +101,52 @@ namespace ADO_NET
                     MessageBoxImage.Stop);
             }
             cmd.Dispose();  // команда - unmanaged, потрібно вивільняти ресурс
+        }
+
+
+        private void CreateProducts_Click(object sender, RoutedEventArgs e)
+        {
+            String sql =
+                @"CREATE TABLE Products (
+	                Id			CHAR(36) NOT NULL PRIMARY KEY,
+	                Name		VARCHAR(50) NOT NULL,
+	                Price		FLOAT  NOT NULL
+                    ) ENGINE = INNODB DEFAULT CHARSET = UTF8";
+            using MySqlCommand cmd = new(sql, _connection);
+            try
+            {
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Create Products OK");
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Create Products error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Stop);
+            }
+            cmd.Dispose();
+        }
+
+        private void CreateManagers_Click(object sender, RoutedEventArgs e)
+        {
+            String sql = File.ReadAllText("sql/CreateManagers.sql");
+            using MySqlCommand cmd = new(sql, _connection);
+            try
+            {
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Create Managers OK");
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Create Managers error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Stop);
+            }
+            cmd.Dispose();
         }
         #endregion
 
@@ -130,6 +179,174 @@ namespace ADO_NET
                     MessageBoxImage.Stop);
             }
             cmd.Dispose();
+            ShowMonitor();
         }
+
+        private void FillProducts_Click(object sender, RoutedEventArgs e)
+        {
+            String sql = File.ReadAllText("sql/FillProducts.sql");
+            using MySqlCommand cmd = new(sql, _connection);
+            try
+            {
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Fill Products OK");
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Fill Products error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Stop);
+            }
+            cmd.Dispose();
+            ShowMonitor();
+        }
+
+        private void FillManagers_Click(object sender, RoutedEventArgs e)
+        {
+            String sql = File.ReadAllText("sql/FillManagers.sql");
+            using MySqlCommand cmd = new(sql, _connection);
+            try
+            {
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Fill Managers OK");
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Fill Managers error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Stop);
+            }
+            cmd.Dispose();
+            ShowMonitor();
+        }
+
+        #region Запросы с одним (скалярным) результатом
+
+        private void ShowMonitorDepartments()
+        {
+            using MySqlCommand cmd = new("SELECT COUNT(1) FROM Departments", _connection);
+            try
+            {
+                object res = cmd.ExecuteScalar(); // Выполнение запроса + возвращение
+                // левого-верхнего результата из возврата табоицы
+                // возвращает типизованные данные (число, ряд, дату-время, тд), но в форме объекта
+                int cnt = Convert.ToInt32(res);
+                StatusDepartments.Content = cnt.ToString();
+            }
+            catch(MySqlException ex) // ошибка запроса
+            {
+                MessageBox.Show(ex.Message, "SQL error",
+                    MessageBoxButton.OK, MessageBoxImage.Stop);
+                StatusDepartments.Content = "---";
+            }
+            catch(Exception ex) // остальные ошибки (приведение типов)
+            {
+                MessageBox.Show(ex.Message, "Cast error",
+                    MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                StatusDepartments.Content = "---";
+            }
+
+        }
+
+        private void ShowMonitorProducts()
+        {
+            using MySqlCommand cmd = new("SELECT COUNT(1) FROM Products", _connection);
+            try
+            {
+                object res = cmd.ExecuteScalar(); // Выполнение запроса + возвращение
+                // левого-верхнего результата из возврата табоицы
+                // возвращает типизованные данные (число, ряд, дату-время, тд), но в форме объекта
+                int cnt = Convert.ToInt32(res);
+                StatusProducts.Content = cnt.ToString();
+            }
+            catch (MySqlException ex) // ошибка запроса
+            {
+                MessageBox.Show(ex.Message, "SQL error",
+                    MessageBoxButton.OK, MessageBoxImage.Stop);
+                StatusProducts.Content = "---";
+            }
+            catch (Exception ex) // остальные ошибки (приведение типов)
+            {
+                MessageBox.Show(ex.Message, "Cast error",
+                    MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                StatusProducts.Content = "---";
+            }
+
+        }
+
+        private void ShowMonitorManagers()
+        {
+            using MySqlCommand cmd = new("SELECT COUNT(1) FROM Managers", _connection);
+            try
+            {
+                object res = cmd.ExecuteScalar(); // Выполнение запроса + возвращение
+                // левого-верхнего результата из возврата табоицы
+                // возвращает типизованные данные (число, ряд, дату-время, тд), но в форме объекта
+                int cnt = Convert.ToInt32(res);
+                StatusManagers.Content = cnt.ToString();
+            }
+            catch (MySqlException ex) // ошибка запроса
+            {
+                MessageBox.Show(ex.Message, "SQL error",
+                    MessageBoxButton.OK, MessageBoxImage.Stop);
+                StatusManagers.Content = "---";
+            }
+            catch (Exception ex) // остальные ошибки (приведение типов)
+            {
+                MessageBox.Show(ex.Message, "Cast error",
+                    MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                StatusManagers.Content = "---";
+            }
+
+        }
+
+        private void ShowMonitor()
+        {
+            ShowMonitorDepartments();
+            ShowMonitorProducts();
+            ShowMonitorManagers();
+        }
+
+        #endregion
+
+
+        #region Запросы с табличными результатами
+
+        private void ShowDepartmentsView()
+        {
+            using MySqlCommand cmd = new("SELECT * FROM Departments", _connection);
+            try
+            {
+                MySqlDataReader reader = cmd.ExecuteReader();
+                String str = String.Empty;
+                // передача данных по одному ряду
+                while(reader.Read()) // считывает один ряд, если нет - false
+                {
+                    // ряд считывается в сам reader, данные из него можно достать
+                    // а) через геттеры
+                    // б) через индексаторы
+                    str += reader.GetGuid(0)        // типизированный геттер (рекоммендовано)
+                        + " "                       // 
+                        + reader[1]                 // индексатор - object
+                        + "\n";                     // отсчет от 0 по порядку полей в результате
+
+                }
+                ViewDepartments.Text = str;
+                reader.Close(); // !! незакрытый reader блокирует другие комманды к БД
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Error", ex.Message);
+            }
+        }
+
+        #endregion
+
+
+
     }
 }

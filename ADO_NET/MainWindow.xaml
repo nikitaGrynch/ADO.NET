@@ -29,6 +29,7 @@
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
+                <RowDefinition/>
             </Grid.RowDefinitions>
             <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
                    Content="Status-Monitor" HorizontalAlignment="Center"
@@ -37,6 +38,18 @@
                    Content="Connection:" FontSize="20" />
             <Label Grid.Column="1" Grid.Row="1"
                    x:Name="StatusConnection" FontSize="20" />
+            <Label Grid.Column="0" Grid.Row="2"
+                   Content="Departments:" FontSize="20" />
+            <Label Grid.Column="1" Grid.Row="2"
+                   x:Name="StatusDepartments" FontSize="20" />
+            <Label Grid.Column="0" Grid.Row="3"
+                   Content="Products:" FontSize="20" />
+            <Label Grid.Column="1" Grid.Row="3"
+                   x:Name="StatusProducts" FontSize="20" />
+            <Label Grid.Column="0" Grid.Row="4"
+                   Content="Managers:" FontSize="20" />
+            <Label Grid.Column="1" Grid.Row="4"
+                   x:Name="StatusManagers" FontSize="20" />
         </Grid>
 
         <Grid Grid.Column="0" Grid.Row="1">
@@ -45,6 +58,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
+                <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -65,6 +79,39 @@
                     Fill<LineBreak/>Department
                 </TextBlock>
             </Button>
+            <Button x:Name="CreateProducts" Click="CreateProducts_Click"
+                    Grid.Column="1" Grid.Row="1" >
+                <TextBlock TextAlignment="Center">
+                    Create<LineBreak/>Products
+                </TextBlock>
+            </Button>
+            <Button x:Name="FillProducts" Click="FillProducts_Click"
+                    Grid.Column="1" Grid.Row="2" >
+                <TextBlock TextAlignment="Center">
+                    Fill<LineBreak/>Products
+                </TextBlock>
+            </Button>
+            <Button x:Name="CreateManagers" Click="CreateManagers_Click"
+                    Grid.Column="0" Grid.Row="3" >
+                <TextBlock TextAlignment="Center">
+                    Create<LineBreak/>Managers
+                </TextBlock>
+            </Button>
+            <Button x:Name="FillManagers" Click="FillManagers_Click"
+                    Grid.Column="0" Grid.Row="4">
+                <TextBlock TextAlignment="Center">
+                    Fill<LineBreak/>Managers
+                </TextBlock>
+            </Button>
         </Grid>
+        <StackPanel Orientation="Vertical" Grid.Row="0" Grid.Column="1">
+            <Label Content="Departments" HorizontalAlignment="Center"
+                   FontSize="26" FontWeight="DemiBold" />
+            <ScrollViewer HorizontalScrollBarVisibility="Visible"
+                          VerticalScrollBarVisibility="Visible"
+                          Height="170">
+                <TextBlock x:Name="ViewDepartments"/>
+            </ScrollViewer>
+        </StackPanel>
     </Grid>
 </Window>
