@@ -13,5 +13,6 @@ namespace ADO_NET
     /// </summary>
     public partial class App : Application
     {
+        public static readonly string ConnectionString = @"Database=freedb_ADOnet;Datasource=sql.freedb.tech;User=freedb_daniiladmin;Password=k6rraNKpr@ZyJrP";
     }
 }

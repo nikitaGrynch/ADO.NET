@@ -30,12 +30,14 @@ namespace ADO_NET
         {
             InitializeComponent();
             InitializeComponent();
+            /*
             string host = "sql7.freemysqlhosting.net"; // Имя хоста
             string database = "sql7595012"; // Имя базы данных
             string user = "sql7595012"; // Имя пользователя
             string password = "qRQ5I3dUJb"; // Пароль пользователя
+            */
 
-            string conStr = "Database=" + database + ";Datasource=" + host + ";User=" + user + ";Password=" + password;
+            string conStr = App.ConnectionString;
             _connection = new();
             _connection.ConnectionString = conStr;
             // !! створення об'єкта не відкиває підключення
@@ -61,6 +63,8 @@ namespace ADO_NET
             }
             ShowMonitor();
             ShowDepartmentsView();
+            ShowProductsView();
+            ShowManagersView();
         }
 
         private void Window_Closed(object sender, EventArgs e)
@@ -82,7 +86,7 @@ namespace ADO_NET
                 @"CREATE TABLE Departments(
                  Id          CHAR(36) NOT NULL PRIMARY KEY,
                  Name        VARCHAR(50) NOT NULL
-                ) ENGINE = INNODB DEFAULT CHARSET = UTF8";
+             ) ENGINE = INNODB DEFAULT CHARSET = UTF8 ";
             /* MySql: CREATE TABLE Departments(
                  Id          CHAR(36) NOT NULL PRIMARY KEY,
                  Name        VARCHAR(50) NOT NULL
@@ -155,7 +159,7 @@ namespace ADO_NET
             MySqlCommand cmd = new();
             cmd.Connection = _connection;
             cmd.CommandText =
-                @"INSERT INTO Departments 
+                 @"INSERT INTO Departments 
                         ( Id, Name )
                   VALUES 
                     ( 'D3C376E4-BCE3-4D85-ABA4-E3CF49612C94',  N'IT отдел'            ), 
@@ -329,16 +333,69 @@ namespace ADO_NET
                     // ряд считывается в сам reader, данные из него можно достать
                     // а) через геттеры
                     // б) через индексаторы
-                    str += reader.GetGuid(0)        // типизированный геттер (рекоммендовано)
-                        + " "                       // 
-                        + reader[1]                 // индексатор - object
-                        + "\n";                     // отсчет от 0 по порядку полей в результате
+                    String id = reader.GetString(0);
+                    str += id.Substring(0, 4) + "..." + id.Substring(id.Length - 2)         // типизированный геттер (рекоммендовано)
+                        + " "                                                               // 
+                        + reader[1]                                                         // индексатор - object
+                        + "\n";                                                             // отсчет от 0 по порядку полей в результате
 
                 }
                 ViewDepartments.Text = str;
                 reader.Close(); // !! незакрытый reader блокирует другие комманды к БД
             }
             catch(Exception ex)
+            {
+                MessageBox.Show("Error", ex.Message);
+            }
+        }
+
+        private void ShowProductsView()
+        {
+            // using MySqlCommand cmd = new("SELECT Id, Name, Price FROM Products", _connection);
+            try
+            {
+                MySqlCommand cmd = new() { Connection= _connection };
+                cmd.CommandText = new("SELECT Id, Name, Price FROM Products");
+                MySqlDataReader reader = cmd.ExecuteReader();
+                String str = String.Empty;
+                while (reader.Read())
+                {
+                    String id = reader.GetGuid(0).ToString();
+                    String name = reader.GetString(1);
+                    double price = reader.GetDouble(2);
+                    str += id.Substring(0, 4) + "..." + id.Substring(id.Length - 2) + " " + name + Math.Round(price, 2).ToString() + "\n";
+
+                }
+                ViewProducts.Text = str;
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error", ex.Message);
+            }
+        }
+
+        private void ShowManagersView()
+        {
+            using MySqlCommand cmd = new("SELECT * FROM Managers JOIN Departments ON Id_main_dep = Departments.Id", _connection);
+            try
+            {
+                MySqlDataReader reader = cmd.ExecuteReader();
+                String str = String.Empty;
+                while (reader.Read())
+                {
+                    String id = reader.GetGuid(0).ToString();
+                    String lastName = reader.GetString(1);
+                    String name = reader.GetString(2);
+                    String secName = reader.GetString(3);
+                    String department = reader.GetString(8);
+                    str += id.Substring(0, 4) + "..." + id.Substring(id.Length - 2) + " " + lastName + " " + name.Substring(0, 1) + ". " + secName.Substring(0, 1) + ". " + department + "\n";
+
+                }
+                ViewManagers.Text = str;
+                reader.Close();
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show("Error", ex.Message);
             }
