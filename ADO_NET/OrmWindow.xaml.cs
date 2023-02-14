@@ -162,7 +162,7 @@ namespace ADO_NET
         private void CreateDepartmentButton_Click(object sender, RoutedEventArgs e)
         {
             CrudDepartmentWindow dialog = new(null!);
-            dialog.Show();
+            dialog.ShowDialog();
         }
     }
 }

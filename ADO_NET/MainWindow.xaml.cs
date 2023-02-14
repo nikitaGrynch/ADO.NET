@@ -29,7 +29,6 @@ namespace ADO_NET
         public MainWindow()
         {
             InitializeComponent();
-            InitializeComponent();
             /*
             string host = "sql7.freemysqlhosting.net"; // Имя хоста
             string database = "sql7595012"; // Имя базы данных

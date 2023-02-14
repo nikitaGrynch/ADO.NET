@@ -8,10 +8,10 @@
         Loaded="Window_Loaded"
         Title="CrudDepartmentWindow" Height="250" Width="500">
     <StackPanel>
-        <Label Content="Редактирование отдела" HorizontalAlignment="Center" FontSize="24" FontWeight="DemiBold" />
+        <Label Name="WindowTitle" Content="Редактирование отдела" HorizontalAlignment="Center" FontSize="24" FontWeight="DemiBold" />
         <StackPanel Orientation="Horizontal">
             <Label Content="Номер:" FontSize="18" Margin="10"/>
-            <TextBox x:Name="IdText" Text="12321321312" VerticalAlignment="Center" FontSize="18" Padding="5" Margin="10"/>
+            <TextBox x:Name="IdText" Text="12321321312" VerticalAlignment="Center" FontSize="18" Padding="5" Margin="10" IsEnabled="False"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <Label Content="Название:" FontSize="18" Margin="10"/>
