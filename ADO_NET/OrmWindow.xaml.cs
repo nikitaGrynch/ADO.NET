@@ -24,7 +24,7 @@ namespace ADO_NET
     {
         private MySqlConnection _connection;
         public ObservableCollection<Entity.Department> Departments { get; set; }
-        public ObservableCollection<Entity.Products> Products { get; set; }
+        public ObservableCollection<Entity.Product> Products { get; set; }
         public ObservableCollection<Entity.Manager> Managers { get; set; }
         public OrmWindow()
         {
@@ -64,7 +64,7 @@ namespace ADO_NET
                 while (reader.Read())
                 {
                     Products.Add(
-                    new Entity.Products
+                    new Entity.Product
                     {
                         Id = reader.GetGuid(0),
                         Name = reader.GetString(1),
@@ -137,13 +137,34 @@ namespace ADO_NET
             }
         }
 
-        private void ListViewItem_MouseDoubleClick_1(object sender, MouseButtonEventArgs e)
+
+        private void ProductsItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (sender is ListViewItem item)
             {
-                if (item.Content is Entity.Products product)
+                if (item.Content is Entity.Product product)
                 {
-                    MessageBox.Show(product.Name);
+                    // MessageBox.Show(department.Name);
+                    CrudProductWindow dialog = new(product);
+                    if (dialog.ShowDialog() == true)  // подтвержденное действие
+                    {
+                        if (dialog.EditedProduct == null)  // Удаление
+                        {
+                            MessageBox.Show("Удаление: " + product.Name);
+                            this.Products.Remove(product);
+                        }
+                        else  // Сохранение
+                        {
+                            int index = this.Products.IndexOf(product);
+                            this.Products.Remove(product);
+                            this.Products.Insert(index, product);
+                            MessageBox.Show("Обновление: " + product.Name);
+                        }
+                    }
+                    else  // окно закрыто или нажата кнопка Cancel
+                    {
+                        MessageBox.Show("Действие отменено");
+                    }
                 }
             }
         }
@@ -164,5 +185,38 @@ namespace ADO_NET
             CrudDepartmentWindow dialog = new(null!);
             dialog.ShowDialog();
         }
+
+        private void CreateProductButton_Click(object sender, RoutedEventArgs e)
+        {
+            CrudProductWindow dialog = new(null!);
+            if (dialog.ShowDialog() == true)
+            {
+                if (dialog.EditedProduct is not null)
+                {
+                    String sql = "INSERT INTO Products (Id, Name, Price) VALUES(@id, @name, @price)";
+                    using MySqlCommand cmd = new(sql, _connection);
+                    cmd.Parameters.AddWithValue("@id", dialog.EditedProduct.Id);
+                    cmd.Parameters.AddWithValue("@name", dialog.EditedProduct.Name);
+                    cmd.Parameters.AddWithValue("@price", dialog.EditedProduct.Price);
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Create OK");
+                        Products.Add(dialog.EditedProduct);
+                    }
+                    catch (MySqlException ex)
+                    {
+                        MessageBox.Show(
+                            ex.Message,
+                            "Create error",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Stop);
+                    }
+                    cmd.Dispose();
+                }
+            }
+        }
+
+
     }
 }

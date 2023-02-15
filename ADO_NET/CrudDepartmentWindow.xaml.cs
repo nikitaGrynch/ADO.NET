@@ -66,7 +66,8 @@ namespace ADO_NET
             }
             if (IdText.Text == String.Empty)
             {
-                using MySqlCommand cmd = new($"SELECT COUNT(*) FROM Departments WHERE Name = '{NameText.Text}'", _connection);
+                using MySqlCommand cmd = new($"SELECT COUNT(*) FROM Departments WHERE Name = @name", _connection);
+                cmd.Parameters.AddWithValue("@name", NameText.Text);
                 try
                 {
                     object res = cmd.ExecuteScalar(); 
@@ -90,15 +91,19 @@ namespace ADO_NET
                         MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 }
                 cmd.Dispose();
+                cmd.Parameters.Clear();
                 cmd.CommandText =
                  $@"INSERT INTO Departments 
                         ( Id, Name )
                   VALUES 
-                    ( '{Guid.NewGuid()}', N'{NameText.Text}' )";
+                    ( @id, @name )";
+                cmd.Parameters.AddWithValue("@name", NameText.Text);
+                cmd.Parameters.AddWithValue("@id", Guid.NewGuid());
                 try
                 {
                     cmd.ExecuteNonQuery();
                     MessageBox.Show("Create OK");
+
                 }
                 catch (MySqlException ex)
                 {
@@ -116,8 +121,10 @@ namespace ADO_NET
                     MessageBox.Show("Нет изменений");
                     return;
                 }
-                String sql = $"UPDATE Departments SET Name = '{NameText.Text}' WHERE Id = '{EditedDepartment.Id}'";
+                String sql = $"UPDATE Departments SET Name = @name WHERE Id = @id";
                 using MySqlCommand cmd = new(sql, _connection);
+                cmd.Parameters.AddWithValue("@name", NameText.Text);
+                cmd.Parameters.AddWithValue("@id", EditedDepartment.Id);
                 try
                 {
                     cmd.ExecuteNonQuery();
@@ -139,8 +146,9 @@ namespace ADO_NET
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            String sql = $"DELETE FROM Departments WHERE Id = '{EditedDepartment.Id}'";
+            String sql = $"DELETE FROM Departments WHERE Id = @id";
             using MySqlCommand cmd = new(sql, _connection);
+            cmd.Parameters.AddWithValue("@id", EditedDepartment.Id);
             try
             {
                 cmd.ExecuteNonQuery();
