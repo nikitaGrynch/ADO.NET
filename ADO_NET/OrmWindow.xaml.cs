@@ -26,12 +26,14 @@ namespace ADO_NET
         public ObservableCollection<Entity.Department> Departments { get; set; }
         public ObservableCollection<Entity.Product> Products { get; set; }
         public ObservableCollection<Entity.Manager> Managers { get; set; }
+        public ObservableCollection<Entity.Sale> Sales { get; set; }
         public OrmWindow()
         {
             InitializeComponent();
             Departments = new();
             Products = new();
             Managers = new();
+            Sales = new();
             DataContext = this;  // место поиска {Binding Departments}
             _connection = new(App.ConnectionString);
         }
@@ -59,17 +61,11 @@ namespace ADO_NET
                 reader.Close();
 
                 #region Load Products
-                cmd.CommandText = "SELECT Id, Name, Price FROM Products P";
+                cmd.CommandText = "SELECT P.* FROM Products P WHERE P.DeleteDt IS NULL";
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    Products.Add(
-                    new Entity.Product
-                    {
-                        Id = reader.GetGuid(0),
-                        Name = reader.GetString(1),
-                        Price = Math.Round(reader.GetDouble(2), 2)
-                    });
+                    Products.Add(new(reader));
                     #endregion
                 }
                 reader.Close();
@@ -92,6 +88,16 @@ namespace ADO_NET
                     });
                     #endregion
                 }
+                reader.Close();
+
+                #region Load Sales
+                cmd.CommandText = "SELECT S.* FROM Sales S WHERE S.DeleteDt IS NULL";
+                reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    Sales.Add(new(reader));
+                }
+                #endregion
                 reader.Close();
 
                 cmd.Dispose();
@@ -150,8 +156,25 @@ namespace ADO_NET
                     {
                         if (dialog.EditedProduct == null)  // Удаление
                         {
-                            MessageBox.Show("Удаление: " + product.Name);
-                            this.Products.Remove(product);
+                            String sql = "UPDATE Products P SET DeleteDt = CURRENT_TIMESTAMP WHERE P.Id = @id";
+                            using MySqlCommand cmd = new(sql, _connection);
+                            cmd.Parameters.AddWithValue("@id", product.Id);
+                            try
+                            {
+                                cmd.ExecuteNonQuery();
+                                MessageBox.Show("Удаление: " + product.Name);
+                                this.Products.Remove(product);
+                            }
+                            catch (MySqlException ex)
+                            {
+                                MessageBox.Show(
+                                    ex.Message,
+                                    "Delete error",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Stop);
+                            }
+                            cmd.Dispose();
+                            
                         }
                         else  // Сохранение
                         {
@@ -175,7 +198,79 @@ namespace ADO_NET
             {
                 if (item.Content is Entity.Manager manager)
                 {
-                    MessageBox.Show(manager.Surname);
+                    CrudManagerWindow dialog = new(manager) { Owner = this };
+                    if (dialog.ShowDialog() == true)
+                    {
+                        if (dialog.DialogResult == true)
+                        {
+
+                        }
+                    }
+                }
+            }
+        }
+        private void SalesItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is ListViewItem item)
+            {
+                if (item.Content is Entity.Sale sale)
+                {
+                    CrudSaleWindow dialog = new(sale) { Owner = this};
+                    if (dialog.ShowDialog() == true)  // подтвержденное действие
+                    {
+                        if (dialog.Sale == null)  // Удаление
+                        {
+                            String sql = "UPDATE Sales S SET DeleteDt = CURRENT_TIMESTAMP WHERE S.Id = @id";
+                            using MySqlCommand cmd = new(sql, _connection);
+                            cmd.Parameters.AddWithValue("@id", sale.Id);
+                            try
+                            {
+                                cmd.ExecuteNonQuery();
+                                MessageBox.Show("Delete OK");
+                                this.Sales.Remove(sale);
+                            }
+                            catch (MySqlException ex)
+                            {
+                                MessageBox.Show(
+                                    ex.Message,
+                                    "Delete error",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Stop);
+                            }
+                            cmd.Dispose();
+
+                        }
+                        else  // Сохранение
+                        {
+                            String sql = "UPDATE Sales S SET ProductId = @productId, ManagerId = @managerId, Cnt = @cnt WHERE S.Id = @id;";
+                            using MySqlCommand cmd = new(sql, _connection);
+                            cmd.Parameters.AddWithValue("@id", dialog.Sale.Id);
+                            cmd.Parameters.AddWithValue("@productId", dialog.Sale.ProductId);
+                            cmd.Parameters.AddWithValue("@managerId", dialog.Sale.ManagerId);
+                            cmd.Parameters.AddWithValue("@cnt", dialog.Sale.Cnt);
+                            try
+                            {
+                                int index = this.Sales.IndexOf(sale);
+                                this.Sales.Remove(sale);
+                                this.Sales.Insert(index, sale);
+                                cmd.ExecuteNonQuery();
+                                MessageBox.Show("Update OK");
+                            }
+                            catch (MySqlException ex)
+                            {
+                                MessageBox.Show(
+                                    ex.Message,
+                                    "Update error",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Stop);
+                            }
+                            cmd.Dispose();
+                        }
+                    }
+                    else  // окно закрыто или нажата кнопка Cancel
+                    {
+                        MessageBox.Show("Действие отменено");
+                    }
                 }
             }
         }
@@ -217,6 +312,37 @@ namespace ADO_NET
             }
         }
 
-
+        private void CreateSaleButton_Click(object sender, RoutedEventArgs e)
+        {
+            CrudSaleWindow dialog = new(null) { Owner = this };
+            if (dialog.ShowDialog() == true)
+            {
+                if (dialog.Sale is not null)
+                {
+                    String sql = "INSERT INTO Sales (Id, ProductId, ManagerId, Cnt, SaleDt) VALUES(@id, @productId, @managerId, @cnt, @saleDt)";
+                    using MySqlCommand cmd = new(sql, _connection);
+                    cmd.Parameters.AddWithValue("@id", dialog.Sale.Id);
+                    cmd.Parameters.AddWithValue("@productId", dialog.Sale.ProductId);
+                    cmd.Parameters.AddWithValue("@managerId", dialog.Sale.ManagerId);
+                    cmd.Parameters.AddWithValue("@cnt", dialog.Sale.Cnt);
+                    cmd.Parameters.AddWithValue("@saleDt", dialog.Sale.SaleDt);
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Create OK");
+                        Sales.Add(dialog.Sale);
+                    }
+                    catch (MySqlException ex)
+                    {
+                        MessageBox.Show(
+                            ex.Message,
+                            "Create error",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Stop);
+                    }
+                    cmd.Dispose();
+                }
+            }
+        }
     }
 }

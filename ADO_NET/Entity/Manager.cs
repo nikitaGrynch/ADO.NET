@@ -16,5 +16,13 @@ namespace ADO_NET.Entity
         public Guid? IdSecDep { get; set; }  // NULL
         public Guid? IdChief { get; set; }   // NULL
 
+        public Manager()
+        {
+            Id = Guid.NewGuid();
+            Name = null!;
+            Surname = null!;
+            Secname = null!;
+        }
+
     }
 }

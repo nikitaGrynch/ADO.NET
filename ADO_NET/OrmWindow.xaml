@@ -91,5 +91,34 @@
                 </ListView.Resources>
             </ListView>
         </StackPanel>
+        <StackPanel Orientation="Vertical"
+                    Grid.Row="1"
+                    Grid.Column="1">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Label Content="Продажи"
+                   FontSize="20"
+                   FontWeight="DemiBold"
+                   HorizontalAlignment="Center" />
+                <Button x:Name="CreateSaleButton" Content="Add" FontSize="16" Click="CreateSaleButton_Click" Margin="0 0 0 10" Padding="3" VerticalAlignment="Center"/>
+            </StackPanel>
+            <ListView ItemsSource="{Binding Sales}" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                      ScrollViewer.VerticalScrollBarVisibility="Visible" MaxHeight="200">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Path=Id}" />
+                        <GridViewColumn Header="Product Id" DisplayMemberBinding="{Binding Path=ProductId}" />
+                        <GridViewColumn Header="Manager Id" DisplayMemberBinding="{Binding Path=ManagerId}" />
+                        <GridViewColumn Header="Count" DisplayMemberBinding="{Binding Path=Cnt}" />
+                        <GridViewColumn Header="SaleDt" DisplayMemberBinding="{Binding Path=SaleDt}" />
+                        <GridViewColumn Header="DeleteDt" DisplayMemberBinding="{Binding Path=DeleteDt}" />
+                    </GridView>
+                </ListView.View>
+                <ListView.Resources>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <EventSetter Event="MouseDoubleClick" Handler="SalesItem_MouseDoubleClick"></EventSetter>
+                    </Style>
+                </ListView.Resources>
+            </ListView>
+        </StackPanel>
     </Grid>
 </Window>
