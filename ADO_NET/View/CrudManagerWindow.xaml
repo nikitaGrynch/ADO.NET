@@ -71,7 +71,7 @@
         </StackPanel>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <Button x:Name="SaveButton" Content="Save" FontSize="20" Padding="10" Margin="10" Width="80" Click="SaveButton_Click"/>
-            <Button x:Name="DeleteButton" Content="Delete" FontSize="20" Padding="10" Margin="10" Width="80" Click="DeleteButton_Click"/>
+            <Button x:Name="DeleteButton" Content="Fire" FontSize="20" Padding="10" Margin="10" Width="80" Click="DeleteButton_Click"/>
             <Button x:Name="CancelButton" Content="Cancel" FontSize="20" Padding="10" Margin="10" Width="80" Click="CancelButton_Click"/>
         </StackPanel>
     </StackPanel>

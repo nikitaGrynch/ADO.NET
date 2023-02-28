@@ -58,11 +58,57 @@ namespace ADO_NET
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            if (this.EditedManager is null)
+            {
+                return;
+            }
+            if (NameText.Text == String.Empty)
+            {
+                MessageBox.Show("Введите имя сотрудника");
+                NameText.Focus();
+                return;
+            }
+            if(SurnameText.Text == String.Empty)
+            {
+                MessageBox.Show("Введите фамилию сотрудника");
+                SurnameText.Focus();
+                return;
+            }
+            if(SecnameText.Text == String.Empty)
+            {
+                MessageBox.Show("Введите отчество сотрудника");
+                SecnameText.Focus();
+                return;
+            }
+
+            EditedManager.Name= NameText.Text;
+            EditedManager.Surname= SurnameText.Text;
+            EditedManager.Secname= SecnameText.Text;
+
+            EditedManager.IdMainDep = (MainDepCombobox.SelectedItem as Entity.Department).Id;
+
+            if (SecDepCombobox.SelectedItem == null)
+            {
+                EditedManager.IdSecDep = null;
+            }
+            else
+            {
+                EditedManager.IdSecDep = (SecDepCombobox.SelectedItem as Entity.Department).Id;
+            }
+            if (ChiefCombobox.SelectedItem == null)
+            {
+                EditedManager.IdChief = null;
+            }
+            else
+            {
+                EditedManager.IdChief = (ChiefCombobox.SelectedItem as Entity.Manager).Id;
+            }
             this.DialogResult = true;
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
+            this.EditedManager= null;
             this.DialogResult = true;
         }
 

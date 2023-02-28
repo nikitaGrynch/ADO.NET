@@ -46,16 +46,12 @@ namespace ADO_NET
                 MySqlCommand cmd = new() { Connection = _connection };
 
                 #region Load Departments
-                cmd.CommandText = "SELECT Id, Name FROM Departments D";
+                cmd.CommandText = "SELECT D.* FROM Departments D";
                 var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
                     Departments.Add(
-                    new Entity.Department
-                    {
-                        Id = reader.GetGuid(0),
-                        Name = reader.GetString(1),
-                    });
+                    new Entity.Department(reader));
                     #endregion
                 }
                 reader.Close();
@@ -71,21 +67,11 @@ namespace ADO_NET
                 reader.Close();
 
                 #region Load Managers
-                cmd.CommandText = "SELECT M.Id, M.Surname, M.Name, M.Secname, M.Id_main_Dep, M.Id_sec_dep, M.Id_chief FROM Managers M";
+                cmd.CommandText = "SELECT M.* FROM Managers M WHERE M.FireDt IS NULL";
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    Managers.Add(
-                    new Entity.Manager
-                    {
-                        Id = reader.GetGuid(0),
-                        Surname = reader.GetString(1),
-                        Name = reader.GetString(2),
-                        Secname = reader.GetString(3),
-                        IdMainDep = reader.GetGuid(4),
-                        IdSecDep = reader.GetValue(5) == DBNull.Value ? null : reader.GetGuid(5),
-                        IdChief = reader.IsDBNull(6) ? null : reader.GetGuid(6)
-                    });
+                    Managers.Add(new(reader));
                     #endregion
                 }
                 reader.Close();
@@ -201,10 +187,61 @@ namespace ADO_NET
                     CrudManagerWindow dialog = new(manager) { Owner = this };
                     if (dialog.ShowDialog() == true)
                     {
-                        if (dialog.DialogResult == true)
+                        if (dialog.EditedManager == null)  // Удаление
                         {
+                            String sql = "UPDATE Managers M SET FireDt = CURRENT_TIMESTAMP WHERE M.Id = @id";
+                            using MySqlCommand cmd = new(sql, _connection);
+                            cmd.Parameters.AddWithValue("@id", manager.Id);
+                            try
+                            {
+                                cmd.ExecuteNonQuery();
+                                MessageBox.Show("Удаление: " + manager.Surname);
+                                this.Managers.Remove(manager);
+                            }
+                            catch (MySqlException ex)
+                            {
+                                MessageBox.Show(
+                                    ex.Message,
+                                    "Fire error",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Stop);
+                            }
+                            cmd.Dispose();
 
                         }
+                        else  // Сохранение
+                        {
+                            String sql = "UPDATE Managers M SET Name = @name, Surname = @surname, Secname = @secname, Id_main_dep = @idMainDep, Id_sec_dep = @idSecDep, Id_chief = @idChief WHERE M.Id = @id;";
+                            using MySqlCommand cmd = new(sql, _connection);
+                            cmd.Parameters.AddWithValue("@id", dialog.EditedManager.Id);
+                            cmd.Parameters.AddWithValue("@name", dialog.EditedManager.Name);
+                            cmd.Parameters.AddWithValue("@surname", dialog.EditedManager.Surname);
+                            cmd.Parameters.AddWithValue("@secname", dialog.EditedManager.Secname);
+                            cmd.Parameters.AddWithValue("@idMainDep", dialog.EditedManager.IdMainDep);
+                            cmd.Parameters.AddWithValue("@idSecDep", dialog.EditedManager.IdSecDep);
+                            cmd.Parameters.AddWithValue("@idChief", dialog.EditedManager.IdChief);
+                            try
+                            {
+                                int index = this.Managers.IndexOf(manager);
+                                this.Managers.Remove(manager);
+                                this.Managers.Insert(index, manager);
+                                cmd.ExecuteNonQuery();
+                                MessageBox.Show("Update OK");
+                            }
+                            catch (MySqlException ex)
+                            {
+                                MessageBox.Show(
+                                    ex.Message,
+                                    "Update error",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Stop);
+                            }
+                            cmd.Dispose();
+                        }
+                    }
+                    else  // окно закрыто или нажата кнопка Cancel
+                    {
+                        MessageBox.Show("Действие отменено");
                     }
                 }
             }
