@@ -32,11 +32,41 @@
                     <GridView>
                         <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Path=Id}" />
                         <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=Name}" />
+                        <GridViewColumn Header="Main Mans" DisplayMemberBinding="{Binding Path=MainManagers.Count}" />
+                        <GridViewColumn Header="Sec Mans" DisplayMemberBinding="{Binding Path=SecManagers.Count}" />
                     </GridView>
                 </ListView.View>
                 <ListView.Resources>
                     <Style TargetType="{x:Type ListViewItem}">
                         <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"></EventSetter>
+                    </Style>
+                </ListView.Resources>
+            </ListView>
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical"
+                    Grid.Row="1"
+                    Grid.Column="0">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Label Content="Сотрудники"
+                   FontSize="20"
+                   FontWeight="DemiBold"/>
+                <Button x:Name="CreateManagerButton" Content="Add" FontSize="16" Click="CreateManagerButton_Click" Margin="0 0 0 10" Padding="3" VerticalAlignment="Center"/>
+            </StackPanel>
+            <ListView ItemsSource="{Binding ManagersList}" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                      ScrollViewer.VerticalScrollBarVisibility="Visible" MaxHeight="160">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Path=Id}" />
+                        <GridViewColumn Header="Surname" DisplayMemberBinding="{Binding Path=Surname}" />
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=Name}" />
+                        <GridViewColumn Header="MainDep" DisplayMemberBinding="{Binding Path=MainDep.Name}" />
+                        <GridViewColumn Header="SecDep" DisplayMemberBinding="{Binding Path=SecDep.Name}" />
+                    </GridView>
+                </ListView.View>
+                <ListView.Resources>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <EventSetter Event="MouseDoubleClick" Handler="ManagerItem_MouseDoubleClick"></EventSetter>
                     </Style>
                 </ListView.Resources>
             </ListView>

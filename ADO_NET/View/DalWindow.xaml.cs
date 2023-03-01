@@ -22,12 +22,14 @@ namespace ADO_NET.View
     public partial class DalWindow : Window
     {
         public ObservableCollection<Entity.Department> DepartmentsList { get; set; }
+        public ObservableCollection<Entity.Manager> ManagersList { get; set; }
         private readonly DataContext _context;
         public DalWindow()
         {
             InitializeComponent();
             _context = new();
             DepartmentsList = new(_context.Departments.GetAll());
+            ManagersList = new(_context.Managers.GetAll());
             this.DataContext = this;
         }
 
@@ -70,6 +72,20 @@ namespace ADO_NET.View
         {
             CrudDepartmentWindow dialog = new(null!);
             dialog.ShowDialog();
+        }
+
+        private void CreateManagerButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+
+        private void ManagerItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is ListViewItem item)
+            {
+                
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ namespace ADO_NET.DAL
     class DataContext
     {
         internal DepartmentApi Departments;
+        internal ManagerApi Managers;
         private MySqlConnection _connection;
         public DataContext()
         {
@@ -25,7 +26,9 @@ namespace ADO_NET.DAL
                 App.Logger.Log(ex.Message, "SEVERE", this.GetType().Name, MethodInfo.GetCurrentMethod()?.Name ?? "");
                 throw new Exception("Data context init error. See logs for details");
             }
-            Departments = new DepartmentApi(_connection);
+            Departments = new DepartmentApi(_connection, this);
+            Managers = new ManagerApi(_connection, this);
+
         }
     }
 }

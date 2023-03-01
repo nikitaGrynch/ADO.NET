@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using ADO_NET.DAL;
+using MySql.Data.MySqlClient;
 using Mysqlx.Crud;
 using System;
 using System.Collections.Generic;
@@ -20,5 +21,25 @@ namespace ADO_NET.Entity
         public Guid Id { get; set; }        // Отображение поля Id UNIQUEIDENTIFIER
         public String Name { get; set; }    // Отображение поля Name VARCHAR
         public DateTime? DeleteDt { get; set; }
+
+
+        ///////////////////// NAVIGATION PROPERTIES (INVERSE) /////////////////////
+
+        internal DataContext? _dataContext { get; set; } // зависимость - ссылка на контекст данных
+        public List<Entity.Manager>? MainManagers
+        {
+            get => _dataContext?
+                .Managers.
+                GetAll().
+                FindAll(m => m.IdMainDep == this.Id);
+        }
+
+        public List<Entity.Manager>? SecManagers
+        {
+            get => _dataContext?
+                .Managers.
+                GetAll().
+                FindAll(m => m.IdSecDep == this.Id);
+        }
     }
 }
