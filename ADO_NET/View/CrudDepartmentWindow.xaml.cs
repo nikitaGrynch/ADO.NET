@@ -34,118 +34,132 @@ namespace ADO_NET
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (EditedDepartment != null)
+            //if (EditedDepartment != null)
+            //{
+            //    IdText.Text = EditedDepartment.Id.ToString();
+            //    NameText.Text = EditedDepartment.Name;
+            //}
+            //else
+            //{
+            //    IdText.Text = string.Empty;
+            //    NameText.Text = string.Empty;
+            //    WindowTitle.Content = "Создание отдела";
+            //    DeleteButton.IsEnabled = false;
+            //}
+            //try
+            //{
+            //    _connection.Open();
+            //}
+            //catch (MySqlException ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //    this.Close();
+            //}
+            if (EditedDepartment!= null)
             {
-                IdText.Text = EditedDepartment.Id.ToString();
                 NameText.Text = EditedDepartment.Name;
             }
             else
             {
-                IdText.Text = string.Empty;
-                NameText.Text = string.Empty;
-                WindowTitle.Content = "Создание отдела";
+                EditedDepartment = new Entity.Department();
                 DeleteButton.IsEnabled = false;
-            }
-            try
-            {
-                _connection.Open();
-            }
-            catch (MySqlException ex)
-            {
-                MessageBox.Show(ex.Message);
-                this.Close();
+                IdText.Text = EditedDepartment.Id.ToString();
+                NameText.Text = EditedDepartment.Name;
             }
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (NameText.Text == String.Empty)
-            {
-                MessageBox.Show("Введите, пожалуйста, название отдела");
-                return;
-            }
-            if (IdText.Text == String.Empty)
-            {
-                using MySqlCommand cmd = new($"SELECT COUNT(*) FROM Departments WHERE Name = @name", _connection);
-                cmd.Parameters.AddWithValue("@name", NameText.Text);
-                try
-                {
-                    object res = cmd.ExecuteScalar(); 
-                                                      
-                                                      
-                    int cnt = Convert.ToInt32(res);
-                    if (cnt > 0)
-                    {
-                        MessageBox.Show("Отдел с таким названием уже существует");
-                        return;
-                    }
-                }
-                catch (MySqlException ex)
-                {
-                    MessageBox.Show(ex.Message, "SQL error",
-                        MessageBoxButton.OK, MessageBoxImage.Stop);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Cast error",
-                        MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                }
-                cmd.Dispose();
-                cmd.Parameters.Clear();
-                cmd.CommandText =
-                 $@"INSERT INTO Departments 
-                        ( Id, Name )
-                  VALUES 
-                    ( @id, @name )";
-                cmd.Parameters.AddWithValue("@name", NameText.Text);
-                cmd.Parameters.AddWithValue("@id", Guid.NewGuid());
-                try
-                {
-                    cmd.ExecuteNonQuery();
-                    MessageBox.Show("Create OK");
+            //if (NameText.Text == String.Empty)
+            //{
+            //    MessageBox.Show("Введите, пожалуйста, название отдела");
+            //    return;
+            //}
+            //if (IdText.Text == String.Empty)
+            //{
+            //    using MySqlCommand cmd = new($"SELECT COUNT(*) FROM Departments WHERE Name = @name", _connection);
+            //    cmd.Parameters.AddWithValue("@name", NameText.Text);
+            //    try
+            //    {
+            //        object res = cmd.ExecuteScalar(); 
 
-                }
-                catch (MySqlException ex)
-                {
-                    MessageBox.Show(
-                        ex.Message,
-                        "Create error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Stop);
-                }
-                cmd.Dispose();
-            }
-            else {
-                if (NameText.Text == EditedDepartment.Name)
-                {
-                    MessageBox.Show("Нет изменений");
-                    return;
-                }
-                String sql = $"UPDATE Departments SET Name = @name WHERE Id = @id";
-                using MySqlCommand cmd = new(sql, _connection);
-                cmd.Parameters.AddWithValue("@name", NameText.Text);
-                cmd.Parameters.AddWithValue("@id", EditedDepartment.Id);
-                try
-                {
-                    cmd.ExecuteNonQuery();
-                    MessageBox.Show("Update OK");
-                    this.EditedDepartment.Name = NameText.Text;
-                }
-                catch (MySqlException ex)
-                {
-                    MessageBox.Show(
-                        ex.Message,
-                        "Update error",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Stop);
-                }
-                cmd.Dispose();
-            }
+
+            //        int cnt = Convert.ToInt32(res);
+            //        if (cnt > 0)
+            //        {
+            //            MessageBox.Show("Отдел с таким названием уже существует");
+            //            return;
+            //        }
+            //    }
+            //    catch (MySqlException ex)
+            //    {
+            //        MessageBox.Show(ex.Message, "SQL error",
+            //            MessageBoxButton.OK, MessageBoxImage.Stop);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        MessageBox.Show(ex.Message, "Cast error",
+            //            MessageBoxButton.OK, MessageBoxImage.Exclamation);
+            //    }
+            //    cmd.Dispose();
+            //    cmd.Parameters.Clear();
+            //    cmd.CommandText =
+            //     $@"INSERT INTO Departments 
+            //            ( Id, Name )
+            //      VALUES 
+            //        ( @id, @name )";
+            //    cmd.Parameters.AddWithValue("@name", NameText.Text);
+            //    cmd.Parameters.AddWithValue("@id", Guid.NewGuid());
+            //    try
+            //    {
+            //        cmd.ExecuteNonQuery();
+            //        MessageBox.Show("Create OK");
+
+            //    }
+            //    catch (MySqlException ex)
+            //    {
+            //        MessageBox.Show(
+            //            ex.Message,
+            //            "Create error",
+            //            MessageBoxButton.OK,
+            //            MessageBoxImage.Stop);
+            //    }
+            //    cmd.Dispose();
+            //}
+            //else {
+            //    if (NameText.Text == EditedDepartment.Name)
+            //    {
+            //        MessageBox.Show("Нет изменений");
+            //        return;
+            //    }
+            //    String sql = $"UPDATE Departments SET Name = @name WHERE Id = @id";
+            //    using MySqlCommand cmd = new(sql, _connection);
+            //    cmd.Parameters.AddWithValue("@name", NameText.Text);
+            //    cmd.Parameters.AddWithValue("@id", EditedDepartment.Id);
+            //    try
+            //    {
+            //        cmd.ExecuteNonQuery();
+            //        MessageBox.Show("Update OK");
+            //        this.EditedDepartment.Name = NameText.Text;
+            //    }
+            //    catch (MySqlException ex)
+            //    {
+            //        MessageBox.Show(
+            //            ex.Message,
+            //            "Update error",
+            //            MessageBoxButton.OK,
+            //            MessageBoxImage.Stop);
+            //    }
+            //    cmd.Dispose();
+            //}
+            MessageBox.Show("Update OK");
+            EditedDepartment.Name = NameText.Text;
             this.DialogResult = true; // результат ShowDialog() = true и закрывается окно
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
+            /*
             String sql = $"DELETE FROM Departments WHERE Id = @id";
             using MySqlCommand cmd = new(sql, _connection);
             cmd.Parameters.AddWithValue("@id", EditedDepartment.Id);
@@ -164,6 +178,9 @@ namespace ADO_NET
                     MessageBoxImage.Stop);
             }
             cmd.Dispose();
+            this.EditedDepartment = null;
+            this.DialogResult = true;
+            */
             this.EditedDepartment = null;
             this.DialogResult = true;
         }

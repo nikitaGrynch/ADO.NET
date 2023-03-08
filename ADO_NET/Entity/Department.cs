@@ -18,9 +18,17 @@ namespace ADO_NET.Entity
             Name = reader.GetString(1);
             DeleteDt = reader.IsDBNull(2) ? null : reader.GetDateTime(2);
         }
+
+        public Department()
+        {
+            Id = Guid.NewGuid();
+            Name = "";
+            DeleteDt = null;
+        }
         public Guid Id { get; set; }        // Отображение поля Id UNIQUEIDENTIFIER
         public String Name { get; set; }    // Отображение поля Name VARCHAR
         public DateTime? DeleteDt { get; set; }
+
 
 
         ///////////////////// NAVIGATION PROPERTIES (INVERSE) /////////////////////

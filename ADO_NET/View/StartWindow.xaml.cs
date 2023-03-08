@@ -44,5 +44,12 @@ namespace ADO_NET.View
             new View.DalWindow().ShowDialog();
             this.Show();
         }
+
+        private void EfButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
+            new View.EfWindow().ShowDialog();
+            this.Show();
+        }
     }
 }
