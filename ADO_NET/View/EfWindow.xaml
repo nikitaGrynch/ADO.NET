@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ADO_NET.View"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
-        Title="EfWindow" Height="450" Width="1000">
+        Title="EfWindow" Height="500" Width="1000">
     <Grid ShowGridLines="True">
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -54,5 +54,46 @@
                 </ListView.Resources>
             </ListView>
         </StackPanel>
+        <StackPanel Orientation="Vertical"
+                    Grid.Row="1"
+                    Grid.Column="0">
+            <StackPanel Orientation="Horizontal" Margin="5" HorizontalAlignment="Center">
+                <Label Content="Дневная статистика"
+                   FontSize="13"
+                   FontWeight="DemiBold"
+                       HorizontalAlignment="Center"/>
+                <Button x:Name="AddSaleButton" Content="+ продажа" FontSize="10" Click="AddSaleButton_Click" Padding="3" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" Content="Чеков"/>
+                <Label Grid.Row="0" Grid.Column="1" Content="0" x:Name="SalesChecks"/>
+                <Label Grid.Row="1" Grid.Column="0" Content="Товаров"/>
+                <Label Grid.Row="1" Grid.Column="1" Content="0" x:Name="SalesCnt"/>
+                <Label Grid.Row="2" Grid.Column="0" Content="Начало"/>
+                <Label Grid.Row="2" Grid.Column="1" Content="00:00:00" x:Name="StartMoment"/>
+                <Label Grid.Row="3" Grid.Column="0" Content="Конец"/>
+                <Label Grid.Row="3" Grid.Column="1" Content="00:00:00" x:Name="FinishMoment"/>
+                <Label Grid.Row="4" Grid.Column="0" Content="Макс кол-во"/>
+                <Label Grid.Row="4" Grid.Column="1" Content="0" x:Name="MaxCheckCnt"/>
+                <Label Grid.Row="5" Grid.Column="0" Content="Среднее кол-во"/>
+                <Label Grid.Row="5" Grid.Column="1" Content="0.0" x:Name="AvgCheckCnt"/>
+                <Label Grid.Row="6" Grid.Column="0" Content="Возвраты"/>
+                <Label Grid.Row="6" Grid.Column="1" Content="0" x:Name="DeletedCheckCnt"/>
+            </Grid>
+        </StackPanel>
+        
     </Grid>
 </Window>
