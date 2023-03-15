@@ -16,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ADO_NET.View
 {
@@ -72,9 +73,46 @@ namespace ADO_NET.View
             // Возвраты - удаленные чеки
             DeletedCheckCnt.Content = "0";
             */
+            /*
+            var query = efContext.Sales
+                .Where(s => s.SaleDt.Date == DateTime.Today)
+                .GroupBy(s => s.ProductId)
+                .ToList()
+                .Join(                          // Объединение с предыдущим (не с Sales, а с результатом)
+                    efContext.Products,         // inner - с чем объединяем
+                    grp => grp.Key,             // outer - outerKey - grp.Key == s.ProductId (ключ группировки)
+                    p => p.Id,                  // innerKey - Products.Id (с чем совпадает outerKey)
+                    (grp, p) => new             // resultSelector - что делать с парой (grp, p) в
+                    {                           // которой совпадают grp.Key и p.Id :
+                        Name = p.Name,          // создается объект анонимного типа с полями Name и Cnt
+                        Cnt = grp.Count()
+                    }
+                 );
+            */
 
+            var query = efContext.Products
+                .GroupJoin(efContext.Sales
+                    .Where(
+                        s => s.SaleDt.Date == DateTime.Today),
+                        p => p.Id,
+                        s => s.ProductId,
+                        (p, sales) => new { Name = p.Name, checksCnt = sales.Count(), Price = p.Price, productsCnt = sales.Sum(p => p.Cnt)}
+                    );
+            foreach (var item in query)
+            {
+                LogBlock.Text += $"{item.Name} --- {item.checksCnt} шт. (чеков) --- {item.productsCnt} шт. (товаров) --- {Math.Round((item.Price * item.productsCnt), 2)} грн.\n";
+            }
+
+            var bestProduct1 = query.OrderByDescending(p => p.checksCnt).First();
+            BestProduct1.Content = $"{bestProduct1.Name} = {bestProduct1.checksCnt} шт.";
+
+            var bestProduct2 = query.OrderByDescending(p => p.checksCnt).First();
+            BestProduct2.Content = $"{bestProduct2.Name} = {bestProduct2.productsCnt} шт.";
+
+            var bestProduct3 = query.OrderByDescending(p => p.productsCnt * p.Price).First();
+            BestProduct3.Content = $"{bestProduct3.Name} = {Math.Round((bestProduct3.productsCnt * bestProduct3.Price), 2)} грн.";
             DateTime date = new DateTime(2023, 3, 10);
-            var dailySales = efContext.Sales.Where(sale => sale.SaleDt.Date == date.Date).ToList();
+            var dailySales = efContext.Sales.Where(sale => sale.SaleDt.Date == DateTime.Today).ToList();
             SalesChecks.Content = dailySales.Count().ToString();
 
             int totalProducts = 0;
@@ -103,13 +141,13 @@ namespace ADO_NET.View
 
         private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            
+
             if (sender is ListViewItem item)
             {
                 if (item.Content is EFCore.Department department)
                 {
 
-                    CrudDepartmentWindow dialog = new(new Entity.Department() { Id = department.Id, Name = department.Name});
+                    CrudDepartmentWindow dialog = new(new Entity.Department() { Id = department.Id, Name = department.Name });
                     if (dialog.ShowDialog() == true)  // подтвержденное дейсвтие
                     {
                         if (dialog.EditedDepartment is null)  // действие удаления
@@ -121,7 +159,7 @@ namespace ADO_NET.View
                         else  // дейсвтие сохранения
                         {
                             efContext.Departments.Remove(department);
-                            department = new() { Id = department.Id, Name = dialog.EditedDepartment.Name};
+                            department = new() { Id = department.Id, Name = dialog.EditedDepartment.Name };
                             MessageBox.Show("Update: " + department.Name);
                         }
                         efContext.Departments.Add(department);
@@ -133,13 +171,13 @@ namespace ADO_NET.View
                     }
                 }
             }
-            
+
         }
 
         private void CreateDepartmentButton_Click(object sender, RoutedEventArgs e)
         {
             CrudDepartmentWindow dialog = new(null!);
-            if(dialog.ShowDialog() == true)
+            if (dialog.ShowDialog() == true)
             {
                 efContext.Departments.Add(
                     new EFCore.Department()
@@ -153,7 +191,7 @@ namespace ADO_NET.View
 
         private bool HideDeletedDepartmentsFilter(object item)
         {
-            if(item is EFCore.Department department)
+            if (item is EFCore.Department department)
             {
                 return department.DeleteDt is null;
             }
@@ -201,7 +239,6 @@ namespace ADO_NET.View
 
                 // случайный DeleteDt - с вероятностью 1/50, значени - не меньше чем время продажи
                 DateTime? deleteDt = random.Next(0, 2) > 0 ? moment.AddHours(random.Next(1, 48)) : null;
-
                 efContext.Sales.Add(new()
                 {
                     Id = Guid.NewGuid(),
@@ -211,9 +248,11 @@ namespace ADO_NET.View
                     SaleDt = moment,
                     DeleteDt = deleteDt
                 });
-                efContext.SaveChanges();
-                UpdateMonitor();
             }
+
+            efContext.SaveChanges();
+            UpdateMonitor();
+            UpdateDailyStatistics();
         }
     }
 }

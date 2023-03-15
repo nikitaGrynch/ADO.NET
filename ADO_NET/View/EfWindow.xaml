@@ -6,10 +6,10 @@
         xmlns:local="clr-namespace:ADO_NET.View"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
-        Title="EfWindow" Height="500" Width="1000">
+        Title="EfWindow" Height="700" Width="1300">
     <Grid ShowGridLines="True">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition />
+            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
@@ -77,6 +77,10 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0" Grid.Column="0" Content="Чеков"/>
                 <Label Grid.Row="0" Grid.Column="1" Content="0" x:Name="SalesChecks"/>
@@ -92,8 +96,17 @@
                 <Label Grid.Row="5" Grid.Column="1" Content="0.0" x:Name="AvgCheckCnt"/>
                 <Label Grid.Row="6" Grid.Column="0" Content="Возвраты"/>
                 <Label Grid.Row="6" Grid.Column="1" Content="0" x:Name="DeletedCheckCnt"/>
+                <Separator Grid.Row="7" Grid.ColumnSpan="2" />
+                <Label Grid.Row="8" Grid.Column="0" Content="Лучший товар (кол-во чеков)"/>
+                <Label Grid.Row="8" Grid.Column="1" Content="0" x:Name="BestProduct1"/>
+                <Label Grid.Row="9" Grid.Column="0" Content="Лучший товар (кол-во проданных)"/>
+                <Label Grid.Row="9" Grid.Column="1" Content="0" x:Name="BestProduct2"/>
+                <Label Grid.Row="10" Grid.Column="0" Content="Лучший товар (сумма продаж)"/>
+                <Label Grid.Row="10" Grid.Column="1" Content="0" x:Name="BestProduct3"/>
             </Grid>
         </StackPanel>
-        
+
+        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="LogBlock" />
+
     </Grid>
 </Window>
