@@ -131,6 +131,8 @@
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=DepName}" />
+                        <GridViewColumn Header="Checks Cnt" DisplayMemberBinding="{Binding Path=ChecksCnt}" />
+                        <GridViewColumn Header="Products Cnt" DisplayMemberBinding="{Binding Path=ProductsCnt}" />
                         <GridViewColumn Header="Total, Grn" DisplayMemberBinding="{Binding Path=GrnSum}"/>
                     </GridView>
                 </ListView.View>

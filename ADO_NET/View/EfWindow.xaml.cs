@@ -212,7 +212,9 @@ namespace ADO_NET.View
                                 (m, s) => new
                                 {
                                     DepId = m.IdMainDep,
-                                    Grn = s.Join(efContext.Products, s => s.ProductId, p => p.Id, (s, p) => s.Cnt * p.Price).Sum()
+                                    Grn = s.Join(efContext.Products, s => s.ProductId, p => p.Id, (s, p) => s.Cnt * p.Price).Sum(),
+                                    ProductsCnt = s.Sum(s => s.Cnt),
+                                    ChecksCnt = s.Count()
                                 })
                             .Join(efContext.Departments,
                                 m => m.DepId,
@@ -221,14 +223,18 @@ namespace ADO_NET.View
                                 {
                                     DepId = d.Id,
                                     DepName = d.Name,
-                                    Grn = m.Grn
+                                    Grn = m.Grn,
+                                    ProductsCnt = m.ProductsCnt,
+                                    ChecksCnt = m.ChecksCnt
                                 }
                             )
                             .GroupBy(d => d.DepName)
                             .Select(n => new
                             {
                                 DepName = n.Key,
-                                GrnSum = Math.Round(n.Sum(n => n.Grn),2)
+                                GrnSum = Math.Round(n.Sum(n => n.Grn),2),
+                                ChecksCnt = n.Sum(n => n.ChecksCnt),
+                                ProductsCnt = n.Sum(n => n.ProductsCnt)
                             })
                             .OrderByDescending(d => d.GrnSum);
 
