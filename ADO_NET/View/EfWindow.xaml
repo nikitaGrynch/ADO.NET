@@ -14,8 +14,8 @@
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Vertical">
@@ -81,6 +81,9 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0" Grid.Column="0" Content="Чеков"/>
                 <Label Grid.Row="0" Grid.Column="1" Content="0" x:Name="SalesChecks"/>
@@ -103,7 +106,35 @@
                 <Label Grid.Row="9" Grid.Column="1" Content="0" x:Name="BestProduct2"/>
                 <Label Grid.Row="10" Grid.Column="0" Content="Лучший товар (сумма продаж)"/>
                 <Label Grid.Row="10" Grid.Column="1" Content="0" x:Name="BestProduct3"/>
+
+
+                <Label Grid.Row="11" Grid.Column="0" Content="Лучший работник (чеки)"/>
+                <Label Grid.Row="11" Grid.Column="1" Content="0" x:Name="BestManager1"/>
+
+                <Label Grid.Row="12" Grid.Column="0" Content="3 Лучшие работника (шт)"/>
+                <Label Grid.Row="12" Grid.Column="1" x:Name="BestManagers"
+                       Content="1. - &#10;2. -&#10;3. -" xml:space="preserve"/>
+                <Label Grid.Row="14" Grid.Column="0" Content="Лучший работник (грн)"/>
+                <Label Grid.Row="14" Grid.Column="1" Content="0" x:Name="BestManagerGrn"/>
             </Grid>
+        </StackPanel>
+
+        <StackPanel Orientation="Vertical"
+                    Grid.Row="0"
+                    Grid.Column="2">
+            <Label Content="Дневная статистика по отделам"
+                   FontSize="13"
+                   FontWeight="DemiBold"
+                       HorizontalAlignment="Center"/>
+            <ListView x:Name="DepartmentsStatList" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                      ScrollViewer.VerticalScrollBarVisibility="Visible" MaxHeight="160">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=DepName}" />
+                        <GridViewColumn Header="Total, Grn" DisplayMemberBinding="{Binding Path=GrnSum}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
         </StackPanel>
 
         <TextBlock Grid.Row="1" Grid.Column="1" x:Name="LogBlock" />

@@ -90,7 +90,7 @@ namespace ADO_NET.View
                  );
             */
 
-            var query = efContext.Products
+            var products = efContext.Products
                 .GroupJoin(efContext.Sales
                     .Where(
                         s => s.SaleDt.Date == DateTime.Today),
@@ -98,22 +98,88 @@ namespace ADO_NET.View
                         s => s.ProductId,
                         (p, sales) => new { Name = p.Name, checksCnt = sales.Count(), Price = p.Price, productsCnt = sales.Sum(p => p.Cnt)}
                     );
-            foreach (var item in query)
+            foreach (var item in products)
             {
                 LogBlock.Text += $"{item.Name} --- {item.checksCnt} шт. (чеков) --- {item.productsCnt} шт. (товаров) --- {Math.Round((item.Price * item.productsCnt), 2)} грн.\n";
             }
 
-            var bestProduct1 = query.OrderByDescending(p => p.checksCnt).First();
+            var managers = efContext.Managers
+                .GroupJoin(efContext.Sales
+                .Where(
+                    s => s.SaleDt.Date == DateTime.Today),
+                    m => m.Id,
+                    s => s.ManagerId,
+                    (m, s) => new {m.Name, m.Surname, m.Secname, Cnt = s.Count()}
+                    );
+
+            var bestMan1 = managers.OrderByDescending(m => m.Cnt).First();
+
+            BestManager1.Content = bestMan1.Surname + " " + bestMan1.Name[0] + ". " + bestMan1.Secname[0] + ". ---" + bestMan1.Cnt + " шт.";
+
+            var managers2 = efContext.Managers
+                .GroupJoin(efContext.Sales
+                .Where(
+                    s => s.SaleDt.Date == DateTime.Today),
+                    m => m.Id,
+                    s => s.ManagerId,
+                    (m, s) => new {m.Name, m.Surname, m.Secname, Cnt = s.Sum(s => s.Cnt)}
+                );
+
+            var bestManagers = managers2.OrderByDescending(m => m.Cnt).Take(3).ToList();
+
+            BestManagers.Content = "1 - " + bestManagers[0].Surname + " " + bestManagers[0].Name[0] + ". " + bestManagers[0].Secname[0] + ". ---" + bestManagers[0].Cnt + " шт." + "\n" +
+                                    "2 - " + bestManagers[1].Surname + " " + bestManagers[1].Name[0] + ". " + bestManagers[1].Secname[0] + ". ---" + bestManagers[1].Cnt + " шт." + "\n" +
+                                    "3 - " + bestManagers[2].Surname + " " + bestManagers[2].Name[0] + ". " + bestManagers[2].Secname[0] + ". ---" + bestManagers[2].Cnt + " шт." + "\n";
+
+
+            var bestManagerGrn = efContext.Managers
+                .GroupJoin(efContext.Sales
+                .Where(
+                    s => s.SaleDt.Date == DateTime.Today),
+                    m => m.Id,
+                    s => s.ManagerId,
+                    (m, s) => new {
+                        Manager = m,
+                        Grn = s.Join(efContext.Products, s => s.ProductId, p => p.Id, (s, p) => s.Cnt * p.Price).Sum()
+                    }
+                )
+                .OrderByDescending(m => m.Grn)
+                .First();
+
+            var bestGrn = efContext.Managers
+                .GroupJoin(efContext.Sales
+                .Where(
+                    s => s.SaleDt.Date == DateTime.Today)
+                    .Join(efContext.Products, s => s.ProductId, p => p.Id, (s, p) => new {s.ManagerId, Summ = s.Cnt * p.Price}),
+                    m => m.Id,
+                    s => s.ManagerId,
+                    (m, s) => new {
+                        Manager = m,
+                        Grn = s.Sum(s => s.Summ)
+                    }
+                )
+                .OrderByDescending(m => m.Grn)
+                .First();
+
+            BestManagerGrn.Content = bestGrn.Manager.Surname + " " + bestGrn.Manager.Name[0] + ". " + bestGrn.Manager.Secname[0] + " ---- " + Math.Round(bestGrn.Grn, 2) + " грн.";
+
+            var bestProduct1 = products.OrderByDescending(p => p.checksCnt).First();
             BestProduct1.Content = $"{bestProduct1.Name} = {bestProduct1.checksCnt} шт.";
 
-            var bestProduct2 = query.OrderByDescending(p => p.checksCnt).First();
+            var bestProduct2 = products.OrderByDescending(p => p.checksCnt).First();
             BestProduct2.Content = $"{bestProduct2.Name} = {bestProduct2.productsCnt} шт.";
 
-            var bestProduct3 = query.OrderByDescending(p => p.productsCnt * p.Price).First();
+            var bestProduct3 = products.OrderByDescending(p => p.productsCnt * p.Price).First();
             BestProduct3.Content = $"{bestProduct3.Name} = {Math.Round((bestProduct3.productsCnt * bestProduct3.Price), 2)} грн.";
             DateTime date = new DateTime(2023, 3, 10);
             var dailySales = efContext.Sales.Where(sale => sale.SaleDt.Date == DateTime.Today).ToList();
             SalesChecks.Content = dailySales.Count().ToString();
+
+
+            if(dailySales.Count() == 0)
+            {
+                return;
+            }
 
             int totalProducts = 0;
             foreach (var sale in dailySales)
@@ -136,6 +202,37 @@ namespace ADO_NET.View
 
             var deletedCnt = dailySales.Where(sale => sale.DeleteDt is not null).Count();
             DeletedCheckCnt.Content = deletedCnt.ToString();
+
+
+            var departmentsStat = efContext.Managers.GroupJoin(efContext.Sales
+                            .Where(
+                                s => s.SaleDt.Date == DateTime.Today),
+                                m => m.Id,
+                                s => s.ManagerId,
+                                (m, s) => new
+                                {
+                                    DepId = m.IdMainDep,
+                                    Grn = s.Join(efContext.Products, s => s.ProductId, p => p.Id, (s, p) => s.Cnt * p.Price).Sum()
+                                })
+                            .Join(efContext.Departments,
+                                m => m.DepId,
+                                d => d.Id,
+                                (m, d) => new
+                                {
+                                    DepId = d.Id,
+                                    DepName = d.Name,
+                                    Grn = m.Grn
+                                }
+                            )
+                            .GroupBy(d => d.DepName)
+                            .Select(n => new
+                            {
+                                DepName = n.Key,
+                                GrnSum = Math.Round(n.Sum(n => n.Grn),2)
+                            })
+                            .OrderByDescending(d => d.GrnSum);
+
+            DepartmentsStatList.ItemsSource = departmentsStat.ToList();
 
         }
 
