@@ -43,8 +43,20 @@ namespace ADO_NET.View
             // реализуем фильтр: через этот интерфейс
             DepartmentsListView.Filter = // Predicate<Object>
                 obj => (obj as EFCore.Department)?.DeleteDt == null;   // TODO: Replace with HideDeletedDepartmentsFilter
+
+
+            efContext.Managers.Load();
+            ManagersList.ItemsSource = efContext.Managers.Local.ToObservableCollection();
+
+            efContext.Sales.Load();
+            SalesList.ItemsSource = efContext.Sales.Local.ToObservableCollection();
+
+            efContext.Products.Load();
+
             UpdateMonitor();
             UpdateDailyStatistics();
+
+
         }
 
         private void UpdateMonitor()

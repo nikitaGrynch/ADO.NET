@@ -29,6 +29,58 @@ namespace ADO_NET.EFCore
             SeedDepartments(modelBuilder);
             SeedManagers(modelBuilder);
             SeedProducts(modelBuilder);
+
+            // настройска отношений
+            modelBuilder.Entity<EFCore.Manager>()
+                .HasOne(m => m.MainDep)             // референсное навигационное свойство
+                .WithMany(d => d.MainWorkers)           // коллекционное
+                .HasForeignKey(m => m.IdMainDep)      // ключ у Manager (внешний) (опциональное, если название - DepartmentId)
+                .HasPrincipalKey(d => d.Id);        // ключ у Department (опционально, если название - Id)
+
+            modelBuilder.Entity<EFCore.Manager>()
+               .HasOne(m => m.SecDep)             
+               .WithMany(d => d.SecWorkers)       
+               .HasForeignKey(m => m.IdSecDep) 
+               .HasPrincipalKey(d => d.Id);
+
+            // инверсное отношение Department - Manager настраивается автоматически
+
+            modelBuilder.Entity<EFCore.Sale>()
+                .HasOne(s => s.Product)
+                .WithMany(p => p.Sales);
+
+            modelBuilder.Entity<EFCore.Sale>()
+                .HasOne(s => s.Manager)
+                .WithMany(m => m.Sales);
+            //.HasForeignKey(s => s.ManagerId)
+            //.HasPrincipalKey(m => m.Id);
+
+
+            // 1
+            //modelbuilder.entity<manager>()
+            //.hasmany(m => m.products)
+            //.withmany(p => p.managers)
+            //.usingentity<managerproduct>(
+            //    j => j
+            //        .hasone(pt => pt.product)
+            //        .withmany(t => t.managerproduct),
+            //    j => j
+            //        .hasone(pt => pt.manager)
+            //        .withmany(p => p.managerproduct),
+            //    j =>
+            //    {
+            //        j.haskey(t => new { t.productid, t.managerid });
+            //    })
+            //;
+
+            // 2
+            //modelBuilder.Entity<ManagerProduct>()
+            //.HasOne(pt => pt.Manager)
+            //.WithMany(p => p.ManagerProduct);
+
+            //modelBuilder.Entity<ManagerProduct>()
+            //    .HasOne(pt => pt.Product)
+            //    .WithMany(t => t.ManagerProduct);
         }
         #region Data Seed
         private void SeedDepartments(ModelBuilder modelBuilder)

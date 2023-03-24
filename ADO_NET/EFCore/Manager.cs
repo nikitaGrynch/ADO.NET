@@ -16,5 +16,15 @@ namespace ADO_NET.EFCore
         public Guid? IdSecDep { get; set; }  // NULL
         public Guid? IdChief { get; set; }   // NULL
         public DateTime? FireDt { get; set; } // NULL
+
+        ///////////////////////////// NAVIGATION PROPERTIES ////////////////////////////
+        public Department MainDep { get; set; }
+        public Department SecDep { get; set; }
+        public List<Sale> Sales { get; set; }
+        public ICollection<Product> Products { get; set; }
+        public List<ManagerProduct> ManagerProduct { get; set; }
+
     }
+
+
 }

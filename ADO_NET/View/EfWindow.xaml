@@ -10,8 +10,9 @@
     <Grid ShowGridLines="True">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -45,6 +46,9 @@
                         <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Path=Id}" />
                         <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=Name}" />
                         <GridViewColumn Header="DeleteDt" DisplayMemberBinding="{Binding Path=DeleteDt}" Width="0"/>
+                        <GridViewColumn Header="Main Workers" DisplayMemberBinding="{Binding Path=MainWorkers.Count}"/>
+                        <GridViewColumn Header="Sec Workers" DisplayMemberBinding="{Binding Path=SecWorkers.Count}"/>
+                        
                     </GridView>
                 </ListView.View>
                 <ListView.Resources>
@@ -140,6 +144,50 @@
         </StackPanel>
 
         <TextBlock Grid.Row="1" Grid.Column="1" x:Name="LogBlock" />
+        <StackPanel Orientation="Vertical"
+                    Grid.Row="1"
+                    Grid.Column="2">
+            <Label Content="Сотрудники"
+                   FontSize="13"
+                   FontWeight="DemiBold"
+                       HorizontalAlignment="Center"/>
+            <ListView x:Name="ManagersList" ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                      ScrollViewer.VerticalScrollBarVisibility="Visible" MaxHeight="400">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Surname" DisplayMemberBinding="{Binding Path=Surname}" />
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=Name}" />
+                        <GridViewColumn Header="Main Dep" DisplayMemberBinding="{Binding Path=MainDep.Name}"/>
+                        <GridViewColumn Header="Sec Dep" DisplayMemberBinding="{Binding Path=SecDep.Name}"/>
+                        <GridViewColumn Header="Sales" DisplayMemberBinding="{Binding Path=Sales.Count}"/>
+                        <GridViewColumn Header="Products" DisplayMemberBinding="{Binding Path=Products.Count}"/>
 
+                    </GridView>
+                </ListView.View>
+                <ListView.Resources>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick"></EventSetter>
+                    </Style>
+                </ListView.Resources>
+            </ListView>
+        </StackPanel>
+        <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Vertical">
+            <Label Content="Продажи"
+                   FontSize="13"
+                   FontWeight="DemiBold"
+                       HorizontalAlignment="Center"/>
+            <ListView x:Name="SalesList" ScrollViewer.HorizontalScrollBarVisibility="Visible" Grid.Row="1" Grid.Column="2"
+                      ScrollViewer.VerticalScrollBarVisibility="Visible" MaxHeight="400">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Product" DisplayMemberBinding="{Binding Path=Product.Name}" />
+                        <GridViewColumn Header="Cnt" DisplayMemberBinding="{Binding Path=Cnt}" />
+                        <GridViewColumn Header="Manager" DisplayMemberBinding="{Binding Path=Manager.Surname}" />
+                        <GridViewColumn Header="Dt" DisplayMemberBinding="{Binding Path=SaleDt}"/>
+
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </StackPanel>
     </Grid>
 </Window>
