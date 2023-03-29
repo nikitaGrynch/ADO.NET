@@ -17,6 +17,5 @@ namespace ADO_NET.EFCore
 
         public List<Sale> Sales { get; set; }
         public ICollection<Manager> Managers { get; set; }
-        public List<ManagerProduct> ManagerProduct { get; set; }
     }
 }

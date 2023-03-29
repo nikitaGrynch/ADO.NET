@@ -52,6 +52,7 @@ namespace ADO_NET.View
             SalesList.ItemsSource = efContext.Sales.Local.ToObservableCollection();
 
             efContext.Products.Load();
+            ProductList.ItemsSource = efContext.Products.Local.ToObservableCollection();
 
             UpdateMonitor();
             UpdateDailyStatistics();

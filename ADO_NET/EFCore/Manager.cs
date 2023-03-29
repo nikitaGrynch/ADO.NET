@@ -22,7 +22,6 @@ namespace ADO_NET.EFCore
         public Department SecDep { get; set; }
         public List<Sale> Sales { get; set; }
         public ICollection<Product> Products { get; set; }
-        public List<ManagerProduct> ManagerProduct { get; set; }
 
     }
 

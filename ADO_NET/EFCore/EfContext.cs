@@ -56,31 +56,19 @@ namespace ADO_NET.EFCore
             //.HasPrincipalKey(m => m.Id);
 
 
-            // 1
-            //modelbuilder.entity<manager>()
-            //.hasmany(m => m.products)
-            //.withmany(p => p.managers)
-            //.usingentity<managerproduct>(
-            //    j => j
-            //        .hasone(pt => pt.product)
-            //        .withmany(t => t.managerproduct),
-            //    j => j
-            //        .hasone(pt => pt.manager)
-            //        .withmany(p => p.managerproduct),
-            //    j =>
-            //    {
-            //        j.haskey(t => new { t.productid, t.managerid });
-            //    })
-            //;
+            modelBuilder.Entity<Manager>()
+            .HasMany(m => m.Products)
+            .WithMany(p => p.Managers)
+            .UsingEntity<Sale>(
+                j => j
+                    .HasOne(mp => mp.Product)
+                    .WithMany(m => m.Sales)
+                    .HasForeignKey(mp => mp.ProductId),
+                j => j
+                    .HasOne(mp => mp.Manager)
+                    .WithMany(p => p.Sales)
+                    .HasForeignKey(mp => mp.ManagerId));
 
-            // 2
-            //modelBuilder.Entity<ManagerProduct>()
-            //.HasOne(pt => pt.Manager)
-            //.WithMany(p => p.ManagerProduct);
-
-            //modelBuilder.Entity<ManagerProduct>()
-            //    .HasOne(pt => pt.Product)
-            //    .WithMany(t => t.ManagerProduct);
         }
         #region Data Seed
         private void SeedDepartments(ModelBuilder modelBuilder)
